@@ -8,7 +8,26 @@ namespace Entities
 {
     public class Pet
     {
-        public string Name { get; private set; }
+        public Pet(string name, int age)
+        {
+            Name = name;
+            Age = age;
+        }
+
+        private string name;
+        public string Name
+        {
+            get { return name; }
+            private set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new ArgumentException("Name is null or empty!");
+                }
+
+                name = value;
+            }
+        }
 
         private int age;
         public int Age
@@ -18,17 +37,28 @@ namespace Entities
             {
                 if (value < 0 || value > 20)
                 {
-                    throw new Exception("Invalid value for age!");
+                    throw new PetAgeException();
                 }
-
+                
                 age = value;
             }
         }
 
-        public Pet(string name, int age)
+        public IPetDatabase Database { get; set; }
+
+        public bool SaveToDatabase()
         {
-            Name = name;
-            Age = age;
+            return Database.SaveNewPet(this);
+        }
+
+
+    }
+
+    public class PetAgeException : ArgumentOutOfRangeException
+    {
+        public PetAgeException() : base("Age is not in the valid range [0-20]")
+        {
+
         }
     }
 }
